@@ -36,8 +36,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class FCSExpressController extends SpringActionController
 {
     private static final DefaultActionResolver _actionResolver = new DefaultActionResolver(
-            FCSExpressController.class,
-            FCSExpressAssayUploadWizardAction.class);
+            FCSExpressController.class);
 
     public FCSExpressController()
     {
