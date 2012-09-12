@@ -328,41 +328,36 @@ public class FCSExpressDataLoader extends DataLoader
             if (!_reader.hasNext())
                 return null;
 
-            Map<String, Object> ret = null;
             while (_reader.hasNext())
             {
                 switch (_reader.next())
                 {
                     case START_ELEMENT:
-                        expectStartTag("fcs_express_results");
-                        ret = _readResults();
-                        break;
+                    {
+                        if ("fcs_express_results".equals(_reader.getLocalName()))
+                            continue;
+
+                        if ("iteration".equals(_reader.getLocalName()))
+                            return _readIteration();
+
+                        throw new IllegalArgumentException("Unexpected start element: " + _reader.getLocalName());
+                    }
 
                     case END_ELEMENT:
-                        expectEndTag("fcs_express_results");
-                        return ret;
+                    {
+                        // End of empty iteration
+                        if ("iteration".equals(_reader.getLocalName()))
+                            return null;
+
+                        // End of results
+                        if ("fcs_express_results".equals(_reader.getLocalName()))
+                            return null;
+
+                        throw new IllegalArgumentException("Unexpected end element: " + _reader.getLocalName());
+                    }
 
                     case END_DOCUMENT:
                         return null;
-                }
-            }
-
-            throw new IllegalArgumentException("Failed to parse FCSExpress export xml");
-        }
-
-        protected Map<String, Object> _readResults() throws XMLStreamException
-        {
-            expectStartTag("fcs_express_results");
-
-            while (_reader.hasNext())
-            {
-                switch (_reader.nextTag())
-                {
-                    case START_ELEMENT:
-                        expectStartTag("iteration");
-                        Map<String, Object>ret = _readIteration();
-                        expectEndTag("iteration");
-                        return ret;
                 }
             }
 
