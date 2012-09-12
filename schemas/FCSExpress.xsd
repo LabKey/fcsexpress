@@ -1,0 +1,92 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://denovosoftware.com/FCSExpress/v4.0"
+           targetNamespace="http://denovosoftware.com/FCSExpress/v4.0"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+    <xs:element name="fcs_express_results" type="fcs_express_results_type" />
+
+    <xs:complexType name="fcs_express_results_type">
+        <xs:sequence>
+            <xs:element name="iteration" minOccurs="0" maxOccurs="unbounded" type="iteration_type"/>
+        </xs:sequence>
+        <xs:attribute name="date" type="xs:string" />
+        <xs:attribute name="time" type="xs:string" />
+    </xs:complexType>
+
+    <xs:complexType name="iteration_type">
+        <xs:sequence>
+            <xs:element name="exported_item" minOccurs="0" maxOccurs="unbounded" type="exported_item_type"/>
+        </xs:sequence>
+        <xs:attribute name="number" type="xs:int" />
+    </xs:complexType>
+
+    <xs:complexType name="exported_item_type" abstract="true">
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="type">
+            <xs:simpleType>
+                <xs:restriction base="xs:token">
+                    <xs:enumeration value="token"/>
+                    <xs:enumeration value="PDF"/>
+                    <xs:enumeration value="layout"/>
+                    <xs:enumeration value="publish"/>
+                    <xs:enumeration value="datafile"/>
+                    <xs:enumeration value="PPT"/>
+                    <xs:enumeration value="picture"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="token_type">
+        <xs:complexContent>
+            <xs:extension base="exported_item_type">
+                <xs:sequence>
+                    <xs:element name="value" type="xs:string"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="file_type">
+        <xs:complexContent>
+            <xs:extension base="exported_item_type">
+                <xs:sequence>
+                    <xs:element name="data_source" type="data_source_type" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="data_source_type">
+        <xs:sequence>
+            <xs:element name="base64_data" type="xs:base64Binary"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="xs:string" fixed="base64"/>
+        <xs:attribute name="size" type="xs:int"/>
+    </xs:complexType>
+
+    <xs:complexType name="picture_type">
+        <xs:complexContent>
+            <xs:extension base="file_type">
+                <xs:sequence>
+                    <xs:element name="format">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:token">
+                                <xs:enumeration value="metafile"/>
+                                <xs:enumeration value="jpeg"/>
+                                <xs:enumeration value="png"/>
+                                <xs:enumeration value="bitmap"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="resolution" type="xs:int"/>
+                    <xs:element name="width" type="xs:int"/>
+                    <xs:element name="height" type="xs:int"/>
+                    <xs:element name="data_source" type="data_source_type" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+</xs:schema>

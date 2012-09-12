@@ -1,0 +1,11 @@
+* text=auto !eol
+/FCSExpress.iml -text
+/module.properties -text
+schemas/FCSExpress.xsd -text
+src/org/labkey/fcsexpress/FCSExpressAssayDataHandler.java -text
+src/org/labkey/fcsexpress/FCSExpressAssayProvider.java -text
+src/org/labkey/fcsexpress/FCSExpressAssayRunCreator.java -text
+src/org/labkey/fcsexpress/FCSExpressController.java -text
+src/org/labkey/fcsexpress/FCSExpressDataLoader.java -text
+src/org/labkey/fcsexpress/FCSExpressManager.java -text
+src/org/labkey/fcsexpress/FCSExpressModule.java -text
