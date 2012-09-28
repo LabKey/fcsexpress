@@ -183,27 +183,4 @@ public class FCSExpressAssayProvider extends AbstractTsvAssayProvider
         return PageFlowUtil.urlProvider(AssayUrls.class).getProtocolURL(container, protocol, FCSExpressController.ImportMessageAction.class);
     }
 
-    @Override
-    public List<AssayDataCollector> getDataCollectors(Map<String, File> uploadedFiles, AssayRunUploadForm context)
-    {
-        //return Collections.emptyList();
-        //AssayDataCollector<ImportRunApiUploadContext> collector = new FileUploadDataCollector(1, FILE_INPUT_NAME);
-        return super.getDataCollectors(uploadedFiles, context);
-    }
-
-//    @Override
-//    public ExpRunTable createRunTable(AssaySchema schema, ExpProtocol protocol)
-//    {
-//        // We want to go to the experiment details page instead of the results grid view
-//        ExpRunTable result = super.createRunTable(schema, protocol);
-//
-//        return result;
-//    }
-
-//    @Override
-//    public List<NavTree> getHeaderLinks(ViewContext viewContext, ExpProtocol protocol, ContainerFilter containerFilter)
-//    {
-//        return Collections.emptyList();
-//    }
-
 }

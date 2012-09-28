@@ -15,6 +15,8 @@
  */
 package org.labkey.fcsexpress;
 
+import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,15 +24,19 @@ import org.labkey.api.data.Container;
 import org.labkey.api.iterator.CloseableIterator;
 import org.labkey.api.reader.ColumnDescriptor;
 import org.labkey.api.reader.DataLoader;
+import org.labkey.api.util.FileUtil;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,26 +55,39 @@ import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 public class FCSExpressDataLoader extends DataLoader
 {
     Reader _reader;
+    File _extractFileRoot;
 
-    public FCSExpressDataLoader(File inputFile) throws IOException
+    public FCSExpressDataLoader(File inputFile, File extractFileRoot) throws IOException
     {
         super();
         setSource(inputFile);
+
+        if (extractFileRoot != null && !extractFileRoot.isDirectory())
+            throw new IllegalArgumentException("Extract directory doesn't exist");
+        _extractFileRoot = extractFileRoot;
     }
 
-    public FCSExpressDataLoader(File inputFile, Container mvIndicatorContainer) throws IOException
+    public FCSExpressDataLoader(File inputFile, File extractFileRoot, Container mvIndicatorContainer) throws IOException
     {
         super(mvIndicatorContainer);
         setSource(inputFile);
+
+        if (extractFileRoot != null && !extractFileRoot.isDirectory())
+            throw new IllegalArgumentException("Extract directory doesn't exist");
+        _extractFileRoot = extractFileRoot;
     }
 
-    public FCSExpressDataLoader(Reader reader, Container mvIndicatorContainer) throws IOException
+    public FCSExpressDataLoader(Reader reader, File extractFileRoot, Container mvIndicatorContainer) throws IOException
     {
         super(mvIndicatorContainer);
         if (reader.markSupported())
             _reader = reader;
         else
             _reader = new BufferedReader(reader);
+
+        if (extractFileRoot != null && !extractFileRoot.isDirectory())
+            throw new IllegalArgumentException("Extract directory doesn't exist");
+        _extractFileRoot = extractFileRoot;
     }
 
     @Override
@@ -101,7 +120,8 @@ public class FCSExpressDataLoader extends DataLoader
         try
         {
             xml = getReader();
-            FCSExpressStreamReader reader = new FCSExpressStreamReader(xml);
+            // While inferring files, use null extractFileRoot so binary files aren't saved.
+            FCSExpressStreamReader reader = new FCSExpressStreamReader(xml, null);
             Map<String, Object> row = reader.readFieldMap();
             if (row == null)
             {
@@ -191,7 +211,7 @@ public class FCSExpressDataLoader extends DataLoader
             super(0, false);
             init();
 
-            _parser = new FCSExpressStreamReader(getReader(), _activeColumns);
+            _parser = new FCSExpressStreamReader(getReader(), _extractFileRoot, _activeColumns);
         }
 
         protected void init()
@@ -217,16 +237,20 @@ public class FCSExpressDataLoader extends DataLoader
     {
         private final XMLStreamReader _reader;
         private ColumnDescriptor[] _activeColumns;
+        // Setting extract file root to null won't extract any files while reading.
+        private final File _extractFileRoot;
 
-        protected FCSExpressStreamReader(XMLStreamReader reader) throws IOException, XMLStreamException
+        protected FCSExpressStreamReader(XMLStreamReader reader, File extractFileRoot) throws IOException, XMLStreamException
         {
             _reader = reader;
+            _extractFileRoot = extractFileRoot;
             _activeColumns = null;
         }
 
-        protected FCSExpressStreamReader(XMLStreamReader reader, ColumnDescriptor[] activeColumns) throws IOException, XMLStreamException
+        protected FCSExpressStreamReader(XMLStreamReader reader, File extractFileRoot, ColumnDescriptor[] activeColumns) throws IOException, XMLStreamException
         {
             _reader = reader;
+            _extractFileRoot = extractFileRoot;
             _activeColumns = activeColumns;
         }
 
@@ -325,16 +349,22 @@ public class FCSExpressDataLoader extends DataLoader
         }
         */
 
-        private void expectStartTag(String name)
+        private void expectStartTag(String name) throws XMLStreamException
         {
             if (_reader.isStartElement() && !name.equalsIgnoreCase(_reader.getLocalName()))
-                throw new IllegalArgumentException("Expected start element " + name);
+            {
+                String actual = _reader.hasName() ? _reader.getLocalName() : null;
+                throw new IllegalArgumentException("Expected start element '" + name + "', found '" + actual + "'");
+            }
         }
 
-        private void expectEndTag(String name)
+        private void expectEndTag(String name) throws XMLStreamException
         {
             if (_reader.isEndElement() && !name.equalsIgnoreCase(_reader.getLocalName()))
-                throw new IllegalArgumentException("Expected end element " + name);
+            {
+                String actual = _reader.hasName() ? _reader.getLocalName() : null;
+                throw new IllegalArgumentException("Expected end element '" + name + "', found '" + actual + "'");
+            }
         }
 
         // Called when inferring fields
@@ -384,6 +414,8 @@ public class FCSExpressDataLoader extends DataLoader
             expectStartTag("iteration");
             Map<String, Object> iteration = new LinkedHashMap<String, Object>(_activeColumns == null ? 10 : _activeColumns.length*2);
 
+            int number = Integer.parseInt(_reader.getAttributeValue(null, "number"));
+
             while (_reader.hasNext())
             {
                 switch (_reader.nextTag())
@@ -394,7 +426,7 @@ public class FCSExpressDataLoader extends DataLoader
                         String itemName = _reader.getAttributeValue(null, "name");
                         if (_shouldLoadColumn(itemName))
                         {
-                            Object value = _readExportedItem();
+                            Object value = _readExportedItem(number, itemName);
                             iteration.put(itemName, value);
                         }
                         break;
@@ -419,7 +451,7 @@ public class FCSExpressDataLoader extends DataLoader
             return true;
         }
 
-        protected Object _readExportedItem() throws XMLStreamException
+        protected Object _readExportedItem(int iterationNumber, String itemName) throws XMLStreamException
         {
             expectStartTag("exported_item");
 
@@ -427,20 +459,11 @@ public class FCSExpressDataLoader extends DataLoader
             if ("token".equals(type))
                 return _readToken();
             else if (isFileType(type))
-                return null; //_readExportedFile();
+                return _readExportedFile(iterationNumber, itemName, type);
             else if ("picture".equalsIgnoreCase(type))
-                return null; //_readExportedImage();
+                return _readExportedImage(iterationNumber, itemName);
             else
                 throw new IllegalArgumentException("Unknown exported item type '" + type + "'");
-        }
-
-        protected boolean isFileType(String type)
-        {
-            return "pdf".equalsIgnoreCase(type) ||
-                    "layout".equalsIgnoreCase(type) ||
-                    "publish".equalsIgnoreCase(type) ||
-                    "datafile".equalsIgnoreCase(type) ||
-                    "ppt".equalsIgnoreCase(type);
         }
 
         // <exported_item type="token" name="% of gated cells">
@@ -482,6 +505,134 @@ public class FCSExpressDataLoader extends DataLoader
             return _reader.getElementText();
         }
 
+        protected boolean isFileType(String type)
+        {
+            return "pdf".equalsIgnoreCase(type) ||
+                    "ppt".equalsIgnoreCase(type) ||
+                    "txt".equalsIgnoreCase(type) ||
+                    "layout".equalsIgnoreCase(type) ||
+                    "publish".equalsIgnoreCase(type) ||
+                    "datafile".equalsIgnoreCase(type);
+        }
+
+        protected String extensionForType(String type)
+        {
+            if ("pdf".equalsIgnoreCase(type))
+                return ".pdf";
+            if ("ppt".equalsIgnoreCase(type))
+                return ".ppt";
+            if ("txt".equalsIgnoreCase(type))
+                return ".txt";
+            if ("layout".equalsIgnoreCase(type))
+                return ".fey";
+            if ("publish".equalsIgnoreCase(type))
+                return ".fey";
+            if ("datafile".equalsIgnoreCase(type))
+                return ".fcs";
+            return "";
+        }
+
+        protected File _readExportedFile(int iterationNumber, String itemName, String type) throws XMLStreamException
+        {
+            expectStartTag("exported_item");
+
+            String filename = "iteration" + iterationNumber + "/" + FileUtil.makeLegalName(itemName) + extensionForType(type);
+            File file = new File(_extractFileRoot, filename);
+
+            while (_reader.hasNext())
+            {
+                switch (_reader.nextTag())
+                {
+                    case START_ELEMENT:
+                        expectStartTag("data_source");
+                        _readDataSource(file);
+                        break;
+
+                    case END_ELEMENT:
+                        expectStartTag("data_source");
+                        return file;
+                }
+            }
+
+            throw new IllegalArgumentException("Failed to parse FCSExpress export xml");
+        }
+
+        protected File _readExportedImage(int iterationNumber, String itemName)
+        {
+            return null;
+        }
+
+        protected void _readDataSource(File file) throws XMLStreamException
+        {
+            expectStartTag("data_source");
+
+            String type = _reader.getAttributeValue(null, "type");
+            if (type == null || type.length() == 0)
+                throw new IllegalArgumentException("Expected data_source type 'base64'");
+            if (!"base64".equals(type))
+                throw new IllegalArgumentException("Unexpected data_source type '" + type + "'");
+
+            while (_reader.hasNext())
+            {
+                switch (_reader.next())
+                {
+                    case START_ELEMENT:
+                        expectStartTag("base64_data");
+                        // Only save data if we have an extraction root directory.
+                        if (_extractFileRoot != null)
+                            _writeBase64(file);
+                        break;
+
+                    case END_ELEMENT:
+                        expectEndTag("base64_data");
+                        return;
+                }
+            }
+
+        }
+
+        protected void _writeBase64(File file) throws XMLStreamException
+        {
+            expectStartTag("base64_data");
+            assert _extractFileRoot != null && _extractFileRoot.isDirectory();
+
+            // Advance to text content
+            _reader.next();
+            if (!_reader.isCharacters())
+                throw new IllegalArgumentException("Expected base64 encoded data");
+
+            File parent = file.getParentFile();
+            if (!parent.mkdirs())
+                throw new RuntimeException("Failed to create directory '" + parent + "'");
+
+            PrintWriter pw = null;
+            try
+            {
+                // Base64OutputStream configured to decode while writing to file.
+                pw = new PrintWriter(new Base64OutputStream(
+                        new BufferedOutputStream(new FileOutputStream(file)), false));
+
+                final int len = 2048;
+                char[] buf = new char[len];
+                for (int sourceStart = 0; ; sourceStart += len)
+                {
+                    int n = _reader.getTextCharacters(sourceStart, buf, 0, buf.length);
+                    pw.print(buf);
+                    if (n < len)
+                        break;
+                }
+                pw.flush();
+                pw.close();
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+            finally
+            {
+                IOUtils.closeQuietly(pw);
+            }
+        }
     }
 
     public static class TestCase
@@ -489,25 +640,31 @@ public class FCSExpressDataLoader extends DataLoader
         @Test
         public void parse() throws Exception
         {
-            File file = new File("/Users/kevink/data/DeNovo/BatchExport 2.xml");
-            FCSExpressDataLoader loader = new FCSExpressDataLoader(file);
-            FCSExpressStreamReader r = new FCSExpressStreamReader(loader.getReader());
+            File file = new File("/Users/kevink/BatchExport.xml");
+            FCSExpressDataLoader loader = new FCSExpressDataLoader(file, null);
+            FCSExpressStreamReader r = new FCSExpressStreamReader(loader.getReader(), null);
 
             Map<String, Object> row = r.readFieldMap();
-            Assert.assertEquals("ApoMono.PBS10'1mMCa+AnnPI", row.get("Sample ID File 1"));
+            Assert.assertEquals("ApoMono.PBS10'1mMCa+AnnPI", row.get("Sample ID"));
+            Assert.assertEquals(new File("iteration1/Gate 1 text.txt"), row.get("Gate 1 text"));
         }
 
         @Test
         public void load() throws IOException
         {
-            File file = new File("/Users/kevink/data/DeNovo/BatchExport 2.xml");
-            FCSExpressDataLoader loader = new FCSExpressDataLoader(file);
+            File file = new File("/Users/kevink/BatchExport.xml");
+            FCSExpressDataLoader loader = new FCSExpressDataLoader(file, new File("/Users/kevink/BatchExport"));
 
             ColumnDescriptor[] cd = loader.getColumns();
-            Assert.assertEquals("Sample ID File 1", cd[0].name);
+            Assert.assertEquals("FCSFile", cd[0].name);
+            Assert.assertEquals("Sample ID", cd[1].name);
+
+            Assert.assertEquals("Gate 1 text", cd[4].name);
+            Assert.assertEquals(File.class, cd[4].clazz);
 
             List<Map<String, Object>> rows = loader.load();
-            Assert.assertEquals("ApoMono.PBS10'1mMCa+AnnPI", rows.get(0).get("Sample ID File 1"));
+            Assert.assertEquals("ApoMono.PBS10'1mMCa+AnnPI", rows.get(0).get("Sample ID"));
+            Assert.assertEquals(new File("iteration1/Gate 1 text.txt"), rows.get(0).get("Gate 1 text"));
         }
     }
 }

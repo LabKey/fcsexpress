@@ -34,6 +34,7 @@ import org.labkey.api.study.assay.AssayDataType;
 import org.labkey.api.study.assay.AssayProvider;
 import org.labkey.api.study.assay.AssayService;
 import org.labkey.api.util.FileType;
+import org.labkey.api.util.FileUtil;
 import org.labkey.api.view.ViewBackgroundInfo;
 
 import java.io.File;
@@ -159,6 +160,12 @@ public class FCSExpressAssayDataHandler extends AbstractAssayTsvDataHandler
 
     protected DataLoader createLoader(File dataFile) throws IOException
     {
-        return new FCSExpressDataLoader(dataFile);
+        String baseName = FileUtil.getBaseName(dataFile);
+        File extractFileRoot = new File(dataFile.getParentFile(), baseName);
+        if (!extractFileRoot.exists())
+            if (!extractFileRoot.mkdirs())
+                throw new IOException("Failed to create directory for extrating binary files");
+
+        return new FCSExpressDataLoader(dataFile, extractFileRoot);
     }
 }
