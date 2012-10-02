@@ -26,6 +26,7 @@ import org.labkey.api.exp.api.ExperimentService;
 import org.labkey.api.exp.api.ExperimentUrls;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
+import org.labkey.api.reader.DataLoaderService;
 import org.labkey.api.security.User;
 import org.labkey.api.security.permissions.Permission;
 import org.labkey.api.study.assay.AssayService;
@@ -64,6 +65,7 @@ public class FCSExpressModule extends DefaultModule
 
     public void doStartup(ModuleContext moduleContext)
     {
+        DataLoaderService.get().registerFactory(new FCSExpressDataLoader.Factory());
         ExperimentService.get().registerExperimentDataHandler(new FCSExpressAssayDataHandler());
         AssayService.get().registerAssayProvider(new FCSExpressAssayProvider());
     }

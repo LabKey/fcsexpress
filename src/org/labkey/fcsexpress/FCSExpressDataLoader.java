@@ -18,13 +18,17 @@ package org.labkey.fcsexpress;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.labkey.api.data.Container;
 import org.labkey.api.iterator.CloseableIterator;
+import org.labkey.api.reader.AbstractDataLoaderFactory;
 import org.labkey.api.reader.ColumnDescriptor;
 import org.labkey.api.reader.DataLoader;
+import org.labkey.api.util.FileType;
 import org.labkey.api.util.FileUtil;
+import org.labkey.api.util.XMLFileType;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -36,6 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -55,6 +60,32 @@ import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
  */
 public class FCSExpressDataLoader extends DataLoader
 {
+    public static final XMLFileType FILE_TYPE = new XMLFileType("", "fcs_express_results");
+
+    public static class Factory extends AbstractDataLoaderFactory
+    {
+        @NotNull
+        @Override
+        public DataLoader createLoader(InputStream is, boolean hasColumnHeaders, Container mvIndicatorContainer) throws IOException
+        {
+            throw new UnsupportedOperationException("Not yet implemented");
+        }
+
+        @NotNull
+        @Override
+        public DataLoader createLoader(File file, boolean hasColumnHeaders, Container mvIndicatorContainer) throws IOException
+        {
+            return new FCSExpressDataLoader(file, null, mvIndicatorContainer);
+        }
+
+        @NotNull
+        @Override
+        public FileType getFileType()
+        {
+            return FILE_TYPE;
+        }
+    }
+
     Reader _reader;
     File _extractFileRoot;
 
