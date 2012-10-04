@@ -34,6 +34,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -68,7 +69,7 @@ public class FCSExpressDataLoader extends DataLoader
         @Override
         public DataLoader createLoader(InputStream is, boolean hasColumnHeaders, Container mvIndicatorContainer) throws IOException
         {
-            throw new UnsupportedOperationException("Not yet implemented");
+            return new FCSExpressDataLoader(is, null, mvIndicatorContainer);
         }
 
         @NotNull
@@ -86,7 +87,7 @@ public class FCSExpressDataLoader extends DataLoader
         }
     }
 
-    Reader _reader;
+    InputStream _is;
     File _extractFileRoot;
 
     public FCSExpressDataLoader(File inputFile, File extractFileRoot) throws IOException
@@ -109,13 +110,13 @@ public class FCSExpressDataLoader extends DataLoader
         _extractFileRoot = extractFileRoot;
     }
 
-    public FCSExpressDataLoader(Reader reader, File extractFileRoot, Container mvIndicatorContainer) throws IOException
+    public FCSExpressDataLoader(InputStream is, File extractFileRoot, Container mvIndicatorContainer) throws IOException
     {
         super(mvIndicatorContainer);
-        if (reader.markSupported())
-            _reader = reader;
+        if (is.markSupported())
+            _is = is;
         else
-            _reader = new BufferedReader(reader);
+            _is = new BufferedInputStream(is);
 
         if (extractFileRoot != null && !extractFileRoot.isDirectory())
             throw new IllegalArgumentException("Extract directory doesn't exist");
@@ -125,17 +126,6 @@ public class FCSExpressDataLoader extends DataLoader
     @Override
     public String[][] getFirstNLines(int n) throws IOException
     {
-        /*
-        ArrayList<String[]> rows = new ArrayList<String[]>(n);
-        for (Iterator<Map<String, Object>> iter = iterator(); n > 0 && iter.hasNext(); n--)
-        {
-            Map<String, Object> row = iter.next();
-            if (row == null)
-                break;
-
-
-        }
-        */
         return new String[0][];
     }
 
@@ -202,11 +192,11 @@ public class FCSExpressDataLoader extends DataLoader
     @Override
     public void close()
     {
-        if (_reader != null)
+        if (_is != null)
         {
             try
             {
-                _reader.close();
+                _is.close();
             }
             catch (IOException e)
             {
@@ -218,20 +208,26 @@ public class FCSExpressDataLoader extends DataLoader
     protected XMLStreamReader getReader() throws IOException, XMLStreamException
     {
         XMLInputFactory factory = XMLInputFactory.newFactory();
-        Reader r;
-        if (null != _reader)
+        InputStream is;
+        if (null != _is)
         {
             // We don't close handed in readers
-            _reader.reset();
-            r = _reader;
+            _is.reset();
+            is = new BufferedInputStream(_is)
+            {
+                @Override
+                public void close() throws IOException
+                {
+                }
+            };
         }
         else
         {
             FileInputStream fis = new FileInputStream(_file);
-            r = new BufferedReader(new InputStreamReader(new BOMInputStream(fis), "UTF-8"));
+            is = new BufferedInputStream(new BOMInputStream(fis));
         }
 
-        return factory.createXMLStreamReader(r);
+        return factory.createXMLStreamReader(is);
     }
 
     protected class FCSExpressIterator extends DataLoaderIterator
@@ -531,7 +527,7 @@ public class FCSExpressDataLoader extends DataLoader
             throw new IllegalArgumentException("Failed to parse FCSExpress export xml");
         }
 
-        protected Object _readTokenValue() throws XMLStreamException
+        protected String _readTokenValue() throws XMLStreamException
         {
             expectStartTag("value");
             return _reader.getElementText();
