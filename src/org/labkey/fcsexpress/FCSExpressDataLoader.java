@@ -207,7 +207,7 @@ public class FCSExpressDataLoader extends DataLoader
 
     protected XMLStreamReader getReader() throws IOException, XMLStreamException
     {
-        XMLInputFactory factory = XMLInputFactory.newFactory();
+        XMLInputFactory factory = XMLInputFactory.newInstance();
         InputStream is;
         if (null != _is)
         {
