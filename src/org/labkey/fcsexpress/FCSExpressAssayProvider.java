@@ -15,6 +15,8 @@
  */
 package org.labkey.fcsexpress;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.Container;
 import org.labkey.api.exp.PropertyType;
 import org.labkey.api.exp.XarContext;
@@ -90,8 +92,9 @@ public class FCSExpressAssayProvider extends AbstractTsvAssayProvider
     }
 
     // XXX: duplicated from TsvAssayProvider
+    @NotNull
     @Override
-    public AssayTableMetadata getTableMetadata(ExpProtocol protocol)
+    public AssayTableMetadata getTableMetadata(@NotNull ExpProtocol protocol)
     {
         return new AssayTableMetadata(
                 this,
@@ -140,9 +143,9 @@ public class FCSExpressAssayProvider extends AbstractTsvAssayProvider
     }
 
     @Override
-    public FilteredTable createDataTable(AssayProtocolSchema schema, boolean includeCopiedToStudyColumns)
+    public AssayProtocolSchema createProtocolSchema(User user, Container container, @NotNull ExpProtocol protocol, @Nullable Container targetStudy)
     {
-        return new AssayResultTable(schema, includeCopiedToStudyColumns);
+        return new FCSExpressProtocolSchema(user, container, protocol, targetStudy);
     }
 
     @Override
