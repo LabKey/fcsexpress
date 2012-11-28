@@ -10,3 +10,4 @@ src/org/labkey/fcsexpress/FCSExpressDataLoader.java -text
 src/org/labkey/fcsexpress/FCSExpressManager.java -text
 src/org/labkey/fcsexpress/FCSExpressModule.java -text
 src/org/labkey/fcsexpress/FCSExpressProtocolSchema.java -text
+src/org/labkey/fcsexpress/importMessage.jsp -text

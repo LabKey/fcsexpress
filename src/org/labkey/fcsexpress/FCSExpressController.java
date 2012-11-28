@@ -28,6 +28,7 @@ import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
+import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
@@ -66,13 +67,15 @@ public class FCSExpressController extends SpringActionController
     public class ImportMessageAction extends SimpleViewAction<ProtocolIdForm>
     {
         @Override
+        public void validate(ProtocolIdForm form, BindException errors)
+        {
+            form.getProtocol(true);
+        }
+
+        @Override
         public ModelAndView getView(ProtocolIdForm form, BindException errors) throws Exception
         {
-            return new HtmlView(
-                    "Please paste this URL into FCS Express:<br>" +
-                    //new ActionURL(ImportRunApiAction.class, getContainer()).addParameter(AbstractAssayAPIAction.ASSAY_ID)
-                    new ActionURL("study", "importRun.api", getContainer()).addParameter("assayId", form.getRowId())
-            );
+            return new JspView<ProtocolIdForm>("/org/labkey/fcsexpress/importMessage.jsp", form, errors);
         }
 
         @Override
