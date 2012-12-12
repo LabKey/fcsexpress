@@ -38,5 +38,5 @@
 </p>
 <p>
     For more information on importing FCSExpress data into LabKey Server, please
-    read the <a href="<%=text("#undone")%>">online documentation</a>.
+    read the <%=helpLink("FCSExpress", "online documentation")%>.
 </p>

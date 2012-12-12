@@ -24,12 +24,14 @@ import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.study.actions.ProtocolIdForm;
 import org.labkey.api.study.assay.AssayUrls;
+import org.labkey.api.util.HelpTopic;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
+import org.labkey.api.view.template.PageConfig;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.web.servlet.ModelAndView;
@@ -42,6 +44,15 @@ public class FCSExpressController extends SpringActionController
     public FCSExpressController()
     {
         setActionResolver(_actionResolver);
+    }
+
+    @Override
+    public PageConfig defaultPageConfig()
+    {
+        // set default help topic for controler
+        PageConfig config = super.defaultPageConfig();
+        config.setHelpTopic(new HelpTopic("FCSExpress"));
+        return config;
     }
 
     @RequiresPermissionClass(ReadPermission.class)
