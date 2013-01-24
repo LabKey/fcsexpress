@@ -1,6 +1,7 @@
 * text=auto !eol
 /FCSExpress.iml -text
 /module.properties -text
+resources/web/fcsexpress/ExportToLabKey.png -text
 schemas/FCSExpress.xsd -text
 src/org/labkey/fcsexpress/FCSExpressAssayDataHandler.java -text
 src/org/labkey/fcsexpress/FCSExpressAssayProvider.java -text

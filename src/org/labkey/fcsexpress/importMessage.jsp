@@ -26,17 +26,20 @@
     JspView<ProtocolIdForm> me = (JspView<ProtocolIdForm>) HttpView.currentView();
     ProtocolIdForm form = me.getModelBean();
     Container c = form.getContainer();
+
+    String importURL = new ActionURL("assay", "importRun.api", c).getURIString(false);
 %>
-<p>
-    Please copy and paste the following URL into the FCSExpress batch action dialog:
-    <br>
-    <br>
-    <%=h(new ActionURL("assay", "importRun.api", c).getURIString(false))%>
-    <br>
-    <br>
-    and enter '<em><%=form.getRowId()%></em>' as the assay id.
+<p>Please copy and paste the following URL into the <em>LabKey Server URL</em> field<br>
+    and enter '<code><%=form.getRowId()%></code>' into the <em>Protocol ID</em> field
+    of the <em>Export to LabKey Options</em> dialog within FCS Express.<br>
 </p>
+<input style="font-family:monospace" type="text" readonly size="<%=importURL.length()+20%>" value="<%=h(importURL)%>">
 <p>
     For more information on importing FCSExpress data into LabKey Server, please
     read the <%=helpLink("FCSExpress", "online documentation")%>.
 </p>
+<div style="display:inline-block; padding-top:2em;">
+    <img src="<%=h(getViewContext().getContextPath())%>/fcsexpress/ExportToLabKey.png" alt="FCS Express: Export to LabKey Options">
+    <div style="text-align:center">Screenshot of <em>FCS Express: Export to LabKey Options</em> dialog.</div>
+</div>
+
