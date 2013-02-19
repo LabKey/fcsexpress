@@ -21,6 +21,7 @@ import org.labkey.api.data.Container;
 import org.labkey.api.exp.PropertyType;
 import org.labkey.api.exp.XarContext;
 import org.labkey.api.exp.api.ExpProtocol;
+import org.labkey.api.exp.api.ExperimentService;
 import org.labkey.api.exp.property.Domain;
 import org.labkey.api.exp.property.DomainProperty;
 import org.labkey.api.exp.property.PropertyService;
@@ -30,6 +31,7 @@ import org.labkey.api.query.FilteredTable;
 import org.labkey.api.security.User;
 import org.labkey.api.study.actions.AssayRunUploadForm;
 import org.labkey.api.study.assay.AbstractTsvAssayProvider;
+import org.labkey.api.study.assay.AssayDataType;
 import org.labkey.api.study.assay.AssayProtocolSchema;
 import org.labkey.api.study.assay.AssayResultTable;
 import org.labkey.api.study.assay.AssayRunCreator;
@@ -74,7 +76,7 @@ public class FCSExpressAssayProvider extends AbstractTsvAssayProvider
 
     public FCSExpressAssayProvider()
     {
-        super(PROTOCOL_PREFIX, RUN_PREFIX, FCSExpressAssayDataHandler.DATA_TYPE);
+        super(PROTOCOL_PREFIX, RUN_PREFIX, (AssayDataType) ExperimentService.get().getDataType(FCSExpressAssayDataHandler.NAMESPACE));
     }
 
     /*

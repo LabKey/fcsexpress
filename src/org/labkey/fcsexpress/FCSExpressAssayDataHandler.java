@@ -52,8 +52,15 @@ public class FCSExpressAssayDataHandler extends AbstractAssayTsvDataHandler
 {
     public static final DataType TRANSFORMED_DATA_TYPE = new DataType("FCSExpressAssayTransformedData"); // a marker data type
 
+    public static final String NAMESPACE = "FCSExpressAssayData";
     public static final AssayDataType DATA_TYPE =
-            new AssayDataType("FCSExpressAssayData", new FileType("BogusExtension"));
+            new AssayDataType(NAMESPACE, new FileType("BogusExtension"));
+
+    @Override
+    public DataType getDataType()
+    {
+        return DATA_TYPE;
+    }
 
     @Override
     protected boolean allowEmptyData()
