@@ -86,7 +86,7 @@ public class FCSExpressController extends SpringActionController
         @Override
         public ModelAndView getView(ProtocolIdForm form, BindException errors) throws Exception
         {
-            return new JspView<ProtocolIdForm>("/org/labkey/fcsexpress/importMessage.jsp", form, errors);
+            return new JspView<>("/org/labkey/fcsexpress/importMessage.jsp", form, errors);
         }
 
         @Override

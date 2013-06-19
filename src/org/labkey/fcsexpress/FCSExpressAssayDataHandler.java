@@ -142,7 +142,7 @@ public class FCSExpressAssayDataHandler extends AbstractAssayTsvDataHandler
                 else
                     column.errorValues = ERROR_VALUE;
             }
-            Map<DataType, List<Map<String, Object>>> datas = new HashMap<DataType, List<Map<String, Object>>>();
+            Map<DataType, List<Map<String, Object>>> datas = new HashMap<>();
             List<Map<String, Object>> dataRows = loader.load();
 
             // loader did not parse any rows

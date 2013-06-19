@@ -151,7 +151,7 @@ public class FCSExpressDataLoader extends DataLoader
             }
             else
             {
-                ArrayList<ColumnDescriptor> cols = new ArrayList<ColumnDescriptor>(row.size());
+                ArrayList<ColumnDescriptor> cols = new ArrayList<>(row.size());
 
                 for (Map.Entry<String, Object> entry : row.entrySet())
                 {
@@ -440,7 +440,7 @@ public class FCSExpressDataLoader extends DataLoader
         protected Map<String, Object> _readIteration() throws XMLStreamException
         {
             expectStartTag("iteration");
-            Map<String, Object> iteration = new LinkedHashMap<String, Object>(_activeColumns == null ? 10 : _activeColumns.length*2);
+            Map<String, Object> iteration = new LinkedHashMap<>(_activeColumns == null ? 10 : _activeColumns.length*2);
 
             int number = Integer.parseInt(_reader.getAttributeValue(null, "number"));
 

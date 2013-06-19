@@ -140,7 +140,7 @@ public class FCSExpressAssayProvider extends AbstractTsvAssayProvider
         DomainProperty dateProperty = addProperty(dataDomain, DATE_PROPERTY_NAME,  DATE_PROPERTY_CAPTION, PropertyType.DATE_TIME, "Used with " + PARTICIPANTID_PROPERTY_NAME + " to identify subject and timepoint for assay.");
         dateProperty.setImportAliasSet(dateImportAliases);
 
-        return new Pair<Domain, Map<DomainProperty, Object>>(dataDomain, Collections.<DomainProperty, Object>emptyMap());
+        return new Pair<>(dataDomain, Collections.<DomainProperty, Object>emptyMap());
     }
 
     @Override
