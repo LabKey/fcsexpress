@@ -16,21 +16,12 @@
 
 package org.labkey.fcsexpress;
 
-import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
-import org.labkey.api.exp.Identifiable;
-import org.labkey.api.exp.Lsid;
-import org.labkey.api.exp.LsidManager;
-import org.labkey.api.exp.api.ExpRun;
 import org.labkey.api.exp.api.ExperimentService;
-import org.labkey.api.exp.api.ExperimentUrls;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.reader.DataLoaderService;
-import org.labkey.api.security.User;
-import org.labkey.api.security.permissions.Permission;
 import org.labkey.api.study.assay.AssayService;
-import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.view.WebPartFactory;
 
 import java.util.Collection;
@@ -45,7 +36,7 @@ public class FCSExpressModule extends DefaultModule
 
     public double getVersion()
     {
-        return 13.10;
+        return 13.20;
     }
 
     public boolean hasScripts()
