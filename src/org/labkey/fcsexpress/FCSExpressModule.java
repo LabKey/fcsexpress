@@ -16,6 +16,7 @@
 
 package org.labkey.fcsexpress;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.exp.api.ExperimentService;
 import org.labkey.api.module.DefaultModule;
@@ -44,6 +45,7 @@ public class FCSExpressModule extends DefaultModule
         return false;
     }
 
+    @NotNull
     protected Collection<WebPartFactory> createWebPartFactories()
     {
         return Collections.emptyList();
@@ -61,6 +63,7 @@ public class FCSExpressModule extends DefaultModule
         AssayService.get().registerAssayProvider(new FCSExpressAssayProvider());
     }
 
+    @NotNull
     @Override
     public Collection<String> getSummary(Container c)
     {
