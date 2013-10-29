@@ -94,6 +94,7 @@ public class FCSExpressDataLoader extends DataLoader
     {
         super();
         setSource(inputFile);
+        setScrollable(true);
 
         if (extractFileRoot != null && !extractFileRoot.isDirectory())
             throw new IllegalArgumentException("Extract directory doesn't exist");
@@ -104,6 +105,7 @@ public class FCSExpressDataLoader extends DataLoader
     {
         super(mvIndicatorContainer);
         setSource(inputFile);
+        setScrollable(true);
 
         if (extractFileRoot != null && !extractFileRoot.isDirectory())
             throw new IllegalArgumentException("Extract directory doesn't exist");
@@ -117,6 +119,7 @@ public class FCSExpressDataLoader extends DataLoader
             _is = is;
         else
             _is = new BufferedInputStream(is);
+        setScrollable(false);
 
         if (extractFileRoot != null && !extractFileRoot.isDirectory())
             throw new IllegalArgumentException("Extract directory doesn't exist");
@@ -205,6 +208,7 @@ public class FCSExpressDataLoader extends DataLoader
         }
     }
 
+    // TODO: Replace with ReaderFactory similar to TabLoader
     protected XMLStreamReader getReader() throws IOException, XMLStreamException
     {
         XMLInputFactory factory = XMLInputFactory.newInstance();
