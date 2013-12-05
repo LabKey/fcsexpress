@@ -35,14 +35,14 @@ public class FCSExpressAssayRunCreator extends DefaultAssayRunCreator<FCSExpress
     }
 
     @Override
-    protected void addInputMaterials(AssayRunUploadContext context, Map<ExpMaterial, String> inputMaterials, ParticipantVisitResolverType resolverType) throws ExperimentException
+    protected void addInputMaterials(AssayRunUploadContext<FCSExpressAssayProvider> context, Map<ExpMaterial, String> inputMaterials, ParticipantVisitResolverType resolverType) throws ExperimentException
     {
         super.addInputMaterials(context, inputMaterials, resolverType);
     }
 
     // XXX: Can we add the File/Attachment columns as output datas here?
     @Override
-    protected void addOutputDatas(AssayRunUploadContext context, Map<ExpData, String> outputDatas, ParticipantVisitResolverType resolverType) throws ExperimentException
+    protected void addOutputDatas(AssayRunUploadContext<FCSExpressAssayProvider> context, Map<ExpData, String> outputDatas, ParticipantVisitResolverType resolverType) throws ExperimentException
     {
         /*
         ExpData data = ExperimentService.get().createData(context.getContainer(), getProvider().getDataType(), "Illumina output placeholder");
