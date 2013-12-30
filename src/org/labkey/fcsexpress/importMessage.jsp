@@ -39,7 +39,7 @@
     read the <%=helpLink("FCSExpress", "online documentation")%>.
 </p>
 <div style="display:inline-block; padding-top:2em;">
-    <img src="<%=h(getViewContext().getContextPath())%>/fcsexpress/ExportToLabKey.png" alt="FCS Express: Export to LabKey Options">
+    <img src="<%=getContextPath()%>/fcsexpress/ExportToLabKey.png" alt="FCS Express: Export to LabKey Options">
     <div style="text-align:center">Screenshot of <em>FCS Express: Export to LabKey Options</em> dialog.</div>
 </div>
 
