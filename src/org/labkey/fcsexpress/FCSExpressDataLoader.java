@@ -681,7 +681,6 @@ public class FCSExpressDataLoader extends DataLoader
                         return;
                 }
             }
-
         }
 
         protected void _writeBase64(File file) throws XMLStreamException
@@ -699,13 +698,9 @@ public class FCSExpressDataLoader extends DataLoader
                 if (!parent.mkdirs())
                     throw new RuntimeException("Failed to create directory '" + parent + "'");
 
-            PrintWriter pw = null;
-            try
+            try (PrintWriter pw = new PrintWriter(new Base64OutputStream(new BufferedOutputStream(new FileOutputStream(file)), false)))
             {
                 // Base64OutputStream configured to decode while writing to file.
-                pw = new PrintWriter(new Base64OutputStream(
-                        new BufferedOutputStream(new FileOutputStream(file)), false));
-
                 do
                 {
                     if (!_reader.isCharacters())
@@ -721,10 +716,6 @@ public class FCSExpressDataLoader extends DataLoader
             catch (IOException e)
             {
                 throw new RuntimeException(e);
-            }
-            finally
-            {
-                IOUtils.closeQuietly(pw);
             }
 
             expectEndTag("base64_data");
