@@ -95,7 +95,7 @@ public class FCSExpressAssayDataHandler extends AbstractAssayTsvDataHandler
         Domain dataDomain = provider.getResultsDomain(protocol);
 
         // XXX: Extract out configuring the loader so AbstractAssayTsvDataHandler subclasses can use it.
-        DomainProperty[] columns = dataDomain.getProperties();
+        List<? extends DomainProperty> columns = dataDomain.getProperties();
         Map<String, DomainProperty> aliases = dataDomain.createImportMap(false);
         Set<String> mvEnabledColumns = Sets.newCaseInsensitiveHashSet();
         Set<String> mvIndicatorColumns = Sets.newCaseInsensitiveHashSet();
@@ -146,7 +146,7 @@ public class FCSExpressAssayDataHandler extends AbstractAssayTsvDataHandler
             List<Map<String, Object>> dataRows = loader.load();
 
             // loader did not parse any rows
-            if (dataRows.isEmpty() && !settings.isAllowEmptyData() && columns.length > 0)
+            if (dataRows.isEmpty() && !settings.isAllowEmptyData() && columns.size() > 0)
                 throw new ExperimentException("Unable to load any rows from the input data. Please check the format of the input data to make sure it matches the assay data columns.");
             //if (!dataRows.isEmpty())
             //    adjustFirstRowOrder(dataRows, loader);
