@@ -15,6 +15,8 @@
  */
 package org.labkey.fcsexpress;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.Container;
 import org.labkey.api.exp.api.ExpProtocol;
 import org.labkey.api.query.FilteredTable;
@@ -28,9 +30,9 @@ import org.labkey.api.study.assay.AssayResultTable;
  */
 public class FCSExpressProtocolSchema extends AssayProtocolSchema
 {
-    public FCSExpressProtocolSchema(User user, Container container, ExpProtocol protocol, Container targetStudy)
+    public FCSExpressProtocolSchema(User user, Container container, @NotNull FCSExpressAssayProvider provider, @NotNull ExpProtocol protocol, @Nullable Container targetStudy)
     {
-        super(user, container, protocol, targetStudy);
+        super(user, container, provider, protocol, targetStudy);
     }
 
     @Override
