@@ -711,7 +711,6 @@ public class FCSExpressDataLoader extends DataLoader
                 while (_reader.next() == XMLStreamConstants.CHARACTERS);
 
                 pw.flush();
-                pw.close();
             }
             catch (IOException e)
             {
