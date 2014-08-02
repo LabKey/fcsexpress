@@ -16,7 +16,6 @@
 package org.labkey.fcsexpress;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
@@ -36,15 +35,12 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -240,7 +236,7 @@ public class FCSExpressDataLoader extends DataLoader
 
         protected FCSExpressIterator() throws IOException, XMLStreamException
         {
-            super(0, false);
+            super(0);
             init();
 
             _parser = new FCSExpressStreamReader(getReader(), _extractFileRoot, _activeColumns);
