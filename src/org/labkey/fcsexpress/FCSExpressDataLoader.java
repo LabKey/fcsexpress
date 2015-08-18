@@ -18,6 +18,7 @@ package org.labkey.fcsexpress;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.input.BOMInputStream;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 import org.labkey.api.data.Container;
@@ -143,7 +144,7 @@ public class FCSExpressDataLoader extends DataLoader
             xml = getReader();
             // While inferring files, use null extractFileRoot so binary files aren't saved.
             FCSExpressStreamReader reader = new FCSExpressStreamReader(xml, null);
-            Map<String, Object> row = reader.readFieldMap();
+            Map<String, Object> row = reader.readFieldMap(null);
             if (row == null)
             {
                 _columns = new ColumnDescriptor[0];
@@ -251,7 +252,7 @@ public class FCSExpressDataLoader extends DataLoader
         {
             try
             {
-                return _parser.readFields();
+                return _parser.readFields(_columns);
             }
             catch (XMLStreamException e)
             {
@@ -282,9 +283,9 @@ public class FCSExpressDataLoader extends DataLoader
             _activeColumns = activeColumns;
         }
 
-        protected Object[] readFields() throws XMLStreamException
+        protected Object[] readFields(@Nullable ColumnDescriptor[] columns) throws XMLStreamException
         {
-            Map<String, Object> row = readFieldMap();
+            Map<String, Object> row = readFieldMap(columns);
             if (row == null)
                 return null;
 
@@ -396,7 +397,7 @@ public class FCSExpressDataLoader extends DataLoader
         }
 
         // Called when inferring fields
-        protected Map<String, Object> readFieldMap() throws XMLStreamException
+        protected Map<String, Object> readFieldMap(@Nullable ColumnDescriptor[] columns) throws XMLStreamException
         {
             if (!_reader.hasNext())
                 return null;
@@ -411,7 +412,7 @@ public class FCSExpressDataLoader extends DataLoader
                             continue;
 
                         if ("iteration".equals(_reader.getLocalName()))
-                            return _readIteration();
+                            return _readIteration(columns);
 
                         throw new IllegalArgumentException("Unexpected start element: " + _reader.getLocalName());
                     }
@@ -437,12 +438,13 @@ public class FCSExpressDataLoader extends DataLoader
             throw new IllegalArgumentException("Failed to parse FCSExpress export xml");
         }
 
-        protected Map<String, Object> _readIteration() throws XMLStreamException
+        protected Map<String, Object> _readIteration(@Nullable ColumnDescriptor[] columns) throws XMLStreamException
         {
             expectStartTag("iteration");
             Map<String, Object> iteration = new LinkedHashMap<>(_activeColumns == null ? 10 : _activeColumns.length*2);
 
             int number = Integer.parseInt(_reader.getAttributeValue(null, "number"));
+            int colIndex = 0;
 
             while (_reader.hasNext())
             {
@@ -452,11 +454,13 @@ public class FCSExpressDataLoader extends DataLoader
                     {
                         expectStartTag("exported_item");
                         String itemName = _reader.getAttributeValue(null, "name");
-                        if (_shouldLoadColumn(itemName))
-                        {
-                            Object value = _readExportedItem(number, itemName);
+
+                        boolean loadThisColumn = null==columns || colIndex >= columns.length || columns[colIndex].load;
+                        Object value = _readExportedItem(number, itemName, loadThisColumn);
+                        if (loadThisColumn)
                             iteration.put(itemName, value);
-                        }
+
+                        colIndex++;
                         break;
                     }
 
@@ -473,13 +477,7 @@ public class FCSExpressDataLoader extends DataLoader
             throw new IllegalArgumentException("Failed to parse FCSExpress export xml");
         }
 
-        protected boolean _shouldLoadColumn(String name)
-        {
-            // XXX: check ColumnDescriptor.load here
-            return true;
-        }
-
-        protected Object _readExportedItem(int iterationNumber, String itemName) throws XMLStreamException
+        protected Object _readExportedItem(int iterationNumber, String itemName, boolean loadThisColumn) throws XMLStreamException
         {
             expectStartTag("exported_item");
 
@@ -487,9 +485,9 @@ public class FCSExpressDataLoader extends DataLoader
             if ("token".equals(type))
                 return _readToken();
             else if (isFileType(type))
-                return _readExportedFile(iterationNumber, itemName, type);
+                return _readExportedFile(iterationNumber, itemName, type, loadThisColumn);
             else if ("picture".equalsIgnoreCase(type))
-                return _readExportedImage(iterationNumber, itemName);
+                return _readExportedImage(iterationNumber, itemName, loadThisColumn);
             else
                 throw new IllegalArgumentException("Unknown exported item type '" + type + "'");
         }
@@ -560,7 +558,7 @@ public class FCSExpressDataLoader extends DataLoader
             return "";
         }
 
-        protected File _readExportedFile(int iterationNumber, String itemName, String type) throws XMLStreamException
+        protected File _readExportedFile(int iterationNumber, String itemName, String type, boolean loadThisColumn) throws XMLStreamException
         {
             expectStartTag("exported_item");
 
@@ -573,7 +571,7 @@ public class FCSExpressDataLoader extends DataLoader
                 {
                     case START_ELEMENT:
                         expectStartTag("data_source");
-                        _readDataSource(file);
+                        _readDataSource(file, loadThisColumn);
                         break;
 
                     case END_ELEMENT:
@@ -600,7 +598,7 @@ public class FCSExpressDataLoader extends DataLoader
             return "." + format.toLowerCase();
         }
 
-        protected File _readExportedImage(int iterationNumber, String itemName) throws XMLStreamException
+        protected File _readExportedImage(int iterationNumber, String itemName, boolean loadThisColumn) throws XMLStreamException
         {
             expectStartTag("exported_item");
 
@@ -631,7 +629,7 @@ public class FCSExpressDataLoader extends DataLoader
                                 throw new IllegalStateException("Picture <format> element must appear before <data_source> element");
                             String filename = "iteration" + iterationNumber + "/" + FileUtil.makeLegalName(itemName) + extensionForPictureFormat(format);
                             file = new File(_extractFileRoot, filename);
-                            _readDataSource(file);
+                            _readDataSource(file, loadThisColumn);
                         }
                         break;
 
@@ -646,7 +644,7 @@ public class FCSExpressDataLoader extends DataLoader
             throw new IllegalArgumentException("Failed to parse FCSExpress export xml");
         }
 
-        protected void _readDataSource(File file) throws XMLStreamException
+        protected void _readDataSource(File file, boolean loadThisColumn) throws XMLStreamException
         {
             expectStartTag("data_source");
 
@@ -663,7 +661,7 @@ public class FCSExpressDataLoader extends DataLoader
                     case START_ELEMENT:
                         expectStartTag("base64_data");
                         // Only save data if we have an extraction root directory.
-                        if (_extractFileRoot != null)
+                        if (_extractFileRoot != null && loadThisColumn)
                         {
                             _writeBase64(file);
                             expectEndTag("base64_data");
@@ -726,7 +724,7 @@ public class FCSExpressDataLoader extends DataLoader
             FCSExpressDataLoader loader = new FCSExpressDataLoader(file, null);
             FCSExpressStreamReader r = new FCSExpressStreamReader(loader.getReader(), null);
 
-            Map<String, Object> row = r.readFieldMap();
+            Map<String, Object> row = r.readFieldMap(null);
             Assert.assertEquals("ApoMono.PBS10'1mMCa+AnnPI", row.get("Sample ID"));
             Assert.assertEquals(new File("iteration1/Gate 1 text.txt"), row.get("Gate 1 text"));
         }
