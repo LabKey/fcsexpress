@@ -19,7 +19,7 @@ package org.labkey.fcsexpress;
 import org.labkey.api.action.RedirectAction;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
-import org.labkey.api.security.RequiresPermissionClass;
+import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.study.actions.ProtocolIdForm;
@@ -27,8 +27,6 @@ import org.labkey.api.study.assay.AssayUrls;
 import org.labkey.api.util.HelpTopic;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.URLHelper;
-import org.labkey.api.view.ActionURL;
-import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
 import org.labkey.api.view.template.PageConfig;
@@ -55,7 +53,7 @@ public class FCSExpressController extends SpringActionController
         return config;
     }
 
-    @RequiresPermissionClass(ReadPermission.class)
+    @RequiresPermission(ReadPermission.class)
     public class BeginAction extends RedirectAction
     {
         @Override
@@ -74,7 +72,7 @@ public class FCSExpressController extends SpringActionController
         public void validateCommand(Object target, Errors errors) {}
     }
 
-    @RequiresPermissionClass(InsertPermission.class)
+    @RequiresPermission(InsertPermission.class)
     public class ImportMessageAction extends SimpleViewAction<ProtocolIdForm>
     {
         @Override
