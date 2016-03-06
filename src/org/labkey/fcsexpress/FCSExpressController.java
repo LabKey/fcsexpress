@@ -47,7 +47,7 @@ public class FCSExpressController extends SpringActionController
     @Override
     public PageConfig defaultPageConfig()
     {
-        // set default help topic for controler
+        // set default help topic for controller
         PageConfig config = super.defaultPageConfig();
         config.setHelpTopic(new HelpTopic("FCSExpress"));
         return config;
