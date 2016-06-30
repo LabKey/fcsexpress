@@ -19,6 +19,7 @@ package org.labkey.fcsexpress;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.exp.api.ExperimentService;
+import org.labkey.api.module.CodeOnlyModule;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.reader.DataLoaderService;
@@ -28,21 +29,11 @@ import org.labkey.api.view.WebPartFactory;
 import java.util.Collection;
 import java.util.Collections;
 
-public class FCSExpressModule extends DefaultModule
+public class FCSExpressModule extends CodeOnlyModule
 {
     public String getName()
     {
         return "FCSExpress";
-    }
-
-    public double getVersion()
-    {
-        return 16.10;
-    }
-
-    public boolean hasScripts()
-    {
-        return false;
     }
 
     @NotNull
