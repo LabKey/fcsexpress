@@ -1,5 +1,4 @@
 * text=auto !eol
-/FCSExpress.iml -text
 /module.properties -text
 resources/web/fcsexpress/ExportToLabKey.png -text
 schemas/FCSExpress.xsd -text
