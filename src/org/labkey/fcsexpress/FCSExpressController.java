@@ -63,7 +63,7 @@ public class FCSExpressController extends SpringActionController
         }
 
         @Override
-        public boolean doAction(Object o, BindException errors) throws Exception
+        public boolean doAction(Object o, BindException errors)
         {
             return true;
         }
@@ -82,7 +82,7 @@ public class FCSExpressController extends SpringActionController
         }
 
         @Override
-        public ModelAndView getView(ProtocolIdForm form, BindException errors) throws Exception
+        public ModelAndView getView(ProtocolIdForm form, BindException errors)
         {
             return new JspView<>("/org/labkey/fcsexpress/importMessage.jsp", form, errors);
         }

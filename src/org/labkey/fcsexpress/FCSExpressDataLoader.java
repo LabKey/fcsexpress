@@ -64,7 +64,7 @@ public class FCSExpressDataLoader extends DataLoader
     {
         @NotNull
         @Override
-        public DataLoader createLoader(InputStream is, boolean hasColumnHeaders, Container mvIndicatorContainer) throws IOException
+        public DataLoader createLoader(InputStream is, boolean hasColumnHeaders, Container mvIndicatorContainer)
         {
             return new FCSExpressDataLoader(is, null, mvIndicatorContainer);
         }
@@ -109,7 +109,7 @@ public class FCSExpressDataLoader extends DataLoader
         _extractFileRoot = extractFileRoot;
     }
 
-    public FCSExpressDataLoader(InputStream is, File extractFileRoot, Container mvIndicatorContainer) throws IOException
+    public FCSExpressDataLoader(InputStream is, File extractFileRoot, Container mvIndicatorContainer)
     {
         super(mvIndicatorContainer);
         if (is.markSupported())
@@ -124,7 +124,7 @@ public class FCSExpressDataLoader extends DataLoader
     }
 
     @Override
-    public String[][] getFirstNLines(int n) throws IOException
+    public String[][] getFirstNLines(int n)
     {
         return new String[0][];
     }
@@ -217,7 +217,7 @@ public class FCSExpressDataLoader extends DataLoader
             is = new BufferedInputStream(_is)
             {
                 @Override
-                public void close() throws IOException
+                public void close()
                 {
                 }
             };
@@ -269,14 +269,14 @@ public class FCSExpressDataLoader extends DataLoader
         // Setting extract file root to null won't extract any files while reading.
         private final File _extractFileRoot;
 
-        protected FCSExpressStreamReader(XMLStreamReader reader, File extractFileRoot) throws IOException, XMLStreamException
+        protected FCSExpressStreamReader(XMLStreamReader reader, File extractFileRoot)
         {
             _reader = reader;
             _extractFileRoot = extractFileRoot;
             _activeColumns = null;
         }
 
-        protected FCSExpressStreamReader(XMLStreamReader reader, File extractFileRoot, ColumnDescriptor[] activeColumns) throws IOException, XMLStreamException
+        protected FCSExpressStreamReader(XMLStreamReader reader, File extractFileRoot, ColumnDescriptor[] activeColumns)
         {
             _reader = reader;
             _extractFileRoot = extractFileRoot;
@@ -378,7 +378,7 @@ public class FCSExpressDataLoader extends DataLoader
         }
         */
 
-        private void expectStartTag(String name) throws XMLStreamException
+        private void expectStartTag(String name)
         {
             if (_reader.isStartElement() && !name.equalsIgnoreCase(_reader.getLocalName()))
             {
@@ -387,7 +387,7 @@ public class FCSExpressDataLoader extends DataLoader
             }
         }
 
-        private void expectEndTag(String name) throws XMLStreamException
+        private void expectEndTag(String name)
         {
             if (_reader.isEndElement() && !name.equalsIgnoreCase(_reader.getLocalName()))
             {
