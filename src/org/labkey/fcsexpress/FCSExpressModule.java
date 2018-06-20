@@ -22,7 +22,6 @@ import org.labkey.api.exp.api.ExperimentService;
 import org.labkey.api.module.CodeOnlyModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.reader.DataLoaderService;
-import org.labkey.api.security.User;
 import org.labkey.api.study.assay.AssayService;
 import org.labkey.api.view.WebPartFactory;
 
@@ -56,7 +55,7 @@ public class FCSExpressModule extends CodeOnlyModule
 
     @NotNull
     @Override
-    public Collection<String> getSummary(Container c, User user)
+    public Collection<String> getSummary(Container c)
     {
         return Collections.emptyList();
     }
