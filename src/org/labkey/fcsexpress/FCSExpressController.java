@@ -61,15 +61,6 @@ public class FCSExpressController extends SpringActionController
         {
             return PageFlowUtil.urlProvider(AssayUrls.class).getAssayListURL(getContainer());
         }
-
-        @Override
-        public boolean doAction(Object o, BindException errors)
-        {
-            return true;
-        }
-
-        @Override
-        public void validateCommand(Object target, Errors errors) {}
     }
 
     @RequiresPermission(InsertPermission.class)
