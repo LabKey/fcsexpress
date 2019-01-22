@@ -57,7 +57,7 @@ public class FCSExpressController extends SpringActionController
     public class BeginAction extends RedirectAction
     {
         @Override
-        public URLHelper getSuccessURL(Object o)
+        public URLHelper getURL(Object o, Errors errors)
         {
             return PageFlowUtil.urlProvider(AssayUrls.class).getAssayListURL(getContainer());
         }
