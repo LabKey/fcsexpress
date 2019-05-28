@@ -1,13 +1,47 @@
-* text=auto !eol
-/module.properties -text
-resources/web/fcsexpress/ExportToLabKey.png -text
-schemas/FCSExpress.xsd -text
-src/org/labkey/fcsexpress/FCSExpressAssayDataHandler.java -text
-src/org/labkey/fcsexpress/FCSExpressAssayProvider.java -text
-src/org/labkey/fcsexpress/FCSExpressAssayRunCreator.java -text
-src/org/labkey/fcsexpress/FCSExpressController.java -text
-src/org/labkey/fcsexpress/FCSExpressDataLoader.java -text
-src/org/labkey/fcsexpress/FCSExpressManager.java -text
-src/org/labkey/fcsexpress/FCSExpressModule.java -text
-src/org/labkey/fcsexpress/FCSExpressProtocolSchema.java -text
-src/org/labkey/fcsexpress/importMessage.jsp -text
+# Convert text files to OS line-endings on checkout, and LF on check-in
+*               text=auto !eol
+
+# Text files to convert
+*.css           text diff=css
+*.htm           text diff=html
+*.html          text diff=html
+*.java          text diff=java
+*.js            text
+*.json          text
+*.jsp           text
+*.jspf          text
+*.jspx          text
+*.properties    text
+*.py            text diff=python
+*.sql           text
+*.tld           text
+*.ts            text
+*.txt           text
+*.xml           text
+*.yml           text
+
+# Keep unix endings
+*.bash          text eol=lf
+*.sh            text eol=lf
+
+# Keep Windows endings
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+
+# Known binary files -- Don't change (binary is a macro for -text -diff)
+*.bin           binary
+*.class         binary
+*.dll           binary
+*.ear           binary
+*.exe           binary
+*.gif           binary
+*.gz            binary
+*.ico           binary
+*.jar           binary
+*.jpg           binary
+*.jpeg          binary
+*.png           binary
+*.so            binary
+*.tar           binary
+*.war           binary
+*.zip           binary
