@@ -18,8 +18,8 @@ package org.labkey.fcsexpress;
 import org.labkey.api.exp.ExperimentException;
 import org.labkey.api.exp.api.ExpData;
 import org.labkey.api.exp.api.ExpMaterial;
-import org.labkey.api.study.assay.AssayRunUploadContext;
-import org.labkey.api.study.assay.DefaultAssayRunCreator;
+import org.labkey.api.assay.AssayRunUploadContext;
+import org.labkey.api.assay.DefaultAssayRunCreator;
 import org.labkey.api.study.assay.ParticipantVisitResolverType;
 
 import java.util.Map;
