@@ -22,7 +22,7 @@ import org.labkey.api.exp.api.ExperimentService;
 import org.labkey.api.module.CodeOnlyModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.reader.DataLoaderService;
-import org.labkey.api.study.assay.AssayService;
+import org.labkey.api.assay.AssayService;
 import org.labkey.api.view.WebPartFactory;
 
 import java.util.Collection;

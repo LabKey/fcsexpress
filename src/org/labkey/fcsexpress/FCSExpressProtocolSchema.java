@@ -22,8 +22,8 @@ import org.labkey.api.data.ContainerFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.exp.api.ExpProtocol;
 import org.labkey.api.security.User;
-import org.labkey.api.study.assay.AssayProtocolSchema;
-import org.labkey.api.study.assay.AssayResultTable;
+import org.labkey.api.assay.AssayProtocolSchema;
+import org.labkey.api.assay.AssayResultTable;
 
 /**
  * User: jeckels
