@@ -16,7 +16,7 @@
 
 package org.labkey.fcsexpress;
 
-import org.labkey.api.action.RedirectAction;
+import org.labkey.api.action.SimpleRedirectAction;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
 import org.labkey.api.security.RequiresPermission;
@@ -54,10 +54,10 @@ public class FCSExpressController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class BeginAction extends RedirectAction
+    public class BeginAction extends SimpleRedirectAction
     {
         @Override
-        public URLHelper getURL(Object o, Errors errors)
+        public URLHelper getRedirectURL(Object o)
         {
             return PageFlowUtil.urlProvider(AssayUrls.class).getAssayListURL(getContainer());
         }
