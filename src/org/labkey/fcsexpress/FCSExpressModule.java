@@ -30,22 +30,26 @@ import java.util.Collections;
 
 public class FCSExpressModule extends CodeOnlyModule
 {
+    @Override
     public String getName()
     {
         return "FCSExpress";
     }
 
+    @Override
     @NotNull
     protected Collection<WebPartFactory> createWebPartFactories()
     {
         return Collections.emptyList();
     }
 
+    @Override
     protected void init()
     {
         addController("fcsexpress", FCSExpressController.class);
     }
 
+    @Override
     public void doStartup(ModuleContext moduleContext)
     {
         DataLoaderService.get().registerFactory(new FCSExpressDataLoader.Factory());
