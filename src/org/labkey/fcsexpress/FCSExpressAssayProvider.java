@@ -112,6 +112,7 @@ public class FCSExpressAssayProvider extends AbstractTsvAssayProvider
     }
 
     // XXX: duplicated from TsvAssayProvider
+    @Override
     public List<Pair<Domain, Map<DomainProperty, Object>>> createDefaultDomains(Container c, User user)
     {
         List<Pair<Domain, Map<DomainProperty, Object>>> result = super.createDefaultDomains(c, user);
