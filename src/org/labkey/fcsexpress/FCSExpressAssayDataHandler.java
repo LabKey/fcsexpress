@@ -15,7 +15,8 @@
  */
 package org.labkey.fcsexpress;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.labkey.api.collections.Sets;
 import org.labkey.api.exp.ExperimentException;
 import org.labkey.api.exp.Lsid;
