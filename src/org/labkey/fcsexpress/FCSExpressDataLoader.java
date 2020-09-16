@@ -130,7 +130,7 @@ public class FCSExpressDataLoader extends DataLoader
     }
 
     @Override
-    protected void initializeColumns() throws IOException
+    protected void initializeColumns(@NotNull Map<String, String> renamedColumns) throws IOException
     {
         if (null == _columns)
             inferColumnInfo();
